@@ -101,7 +101,7 @@ class WizardStepManager:
     def next_step():
         """Move to next step"""
         current = st.session_state.wizard_current_step
-        if current < len(WizardStepManager.STEPS):
+        if current <= len(WizardStepManager.STEPS):
             st.session_state.wizard_completed_steps.add(current)
             st.session_state.wizard_current_step = current + 1
     
@@ -117,7 +117,7 @@ class WizardStepManager:
         """Skip current step"""
         current = st.session_state.wizard_current_step
         st.session_state.wizard_skipped_steps.add(current)
-        if current < len(WizardStepManager.STEPS):
+        if current <= len(WizardStepManager.STEPS):
             st.session_state.wizard_current_step = current + 1
     
     @staticmethod
@@ -162,7 +162,4 @@ class WizardStepManager:
     @staticmethod
     def is_wizard_complete() -> bool:
         """Check if wizard is complete"""
-        total_steps = len(WizardStepManager.STEPS)
-        completed = len(st.session_state.wizard_completed_steps)
-        skipped = len(st.session_state.wizard_skipped_steps)
-        return (completed + skipped) >= total_steps
+        return st.session_state.wizard_current_step > len(WizardStepManager.STEPS)

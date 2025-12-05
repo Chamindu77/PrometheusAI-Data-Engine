@@ -830,38 +830,43 @@ if st.session_state.df_original is not None:
         
         # Advanced Mode - Step-by-Step Wizard
         elif st.session_state.wizard_mode == 'advanced':
-            # Progress bar
-            progress = WizardStepManager.get_progress_percentage()
-            st.progress(progress / 100)
+            # Check if wizard is already complete (to avoid accessing invalid step info)
+            if not WizardStepManager.is_wizard_complete():
+                # Progress bar
+                progress = WizardStepManager.get_progress_percentage()
+                st.progress(progress / 100)
+                
+                current_step = WizardStepManager.get_current_step()
+                step_info = WizardStepManager.get_step_info(current_step)
+                
+                if step_info:
+                    st.markdown(f"### Step {current_step} of 8: {step_info['name']}")
+                    
+                    # Navigation buttons
+                    nav_col1, nav_col2, nav_col3, nav_col4 = st.columns([1, 1, 1, 3])
+                    
+                    with nav_col1:
+                        if current_step > 1:
+                            if st.button("◀ Back", key=f"wizard_back_{current_step}"):
+                                WizardStepManager.previous_step()
+                                st.rerun()
+                    
+                    with nav_col2:
+                        if step_info.get('skippable', False):
+                            if st.button("⏭️ Skip", key=f"wizard_skip_{current_step}"):
+                                WizardStepManager.skip_step()
+                                st.rerun()
+                    
+                    with nav_col3:
+                        if st.button("↩️ Reset", key=f"wizard_reset_{current_step}"):
+                            WizardStepManager.reset_wizard()
+                            if 'data_saved' in st.session_state:
+                                del st.session_state.data_saved
+                            st.rerun()
+                    
+                    st.divider()
             
             current_step = WizardStepManager.get_current_step()
-            step_info = WizardStepManager.get_step_info(current_step)
-            
-            st.markdown(f"### Step {current_step} of 8: {step_info['name']}")
-            
-            # Navigation buttons
-            nav_col1, nav_col2, nav_col3, nav_col4 = st.columns([1, 1, 1, 3])
-            
-            with nav_col1:
-                if current_step > 1:
-                    if st.button("◀ Back"):
-                        WizardStepManager.previous_step()
-                        st.rerun()
-            
-            with nav_col2:
-                if step_info['skippable']:
-                    if st.button("⏭️ Skip"):
-                        WizardStepManager.skip_step()
-                        st.rerun()
-            
-            with nav_col3:
-                if st.button("↩️ Reset"):
-                    WizardStepManager.reset_wizard()
-                    if 'data_saved' in st.session_state:
-                        del st.session_state.data_saved
-                    st.rerun()
-            
-            st.divider()
             
             # STEP 1: Standardize Column Names
             if current_step == 1:
