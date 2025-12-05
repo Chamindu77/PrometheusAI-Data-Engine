@@ -59,6 +59,53 @@ st.markdown("""
         border-left: 4px solid #28a745;
         margin: 10px 0;
     }
+    
+    /* Darken scrollbar thumb */
+    ::-webkit-scrollbar-thumb {
+        background: #888 !important;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+        background: #555 !important;
+    }
+    
+    /* Remove scrollbar highlight/selection in dataframes */
+    [data-testid="stDataFrame"] {
+        scrollbar-color: #888 transparent !important;
+    }
+    
+    [data-testid="stDataFrame"]::-webkit-scrollbar-thumb {
+        background: #888 !important;
+        border: none !important;
+    }
+    
+    [data-testid="stDataFrame"]::-webkit-scrollbar-thumb:active {
+        background: #555 !important;
+    }
+    
+    [data-testid="stDataFrame"]::-webkit-scrollbar-track {
+        background: transparent !important;
+    }
+    
+    /* Professional button hover and focus styling */
+    button[kind="secondary"], button[kind="primary"] {
+        transition: all 0.3s ease !important;
+    }
+    
+    button[kind="secondary"]:hover, button[kind="primary"]:hover {
+        border-color: #6b7280 !important;
+        color: white !important;
+    }
+    
+    button[kind="secondary"]:focus, button[kind="primary"]:focus {
+        border-color: #6b7280 !important;
+        box-shadow: 0 0 0 0.2rem rgba(107, 114, 128, 0.4) !important;
+        outline: none !important;
+    }
+    
+    button[kind="secondary"]:active, button[kind="primary"]:active {
+        border-color: #4b5563 !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -218,10 +265,27 @@ if st.session_state.df_original is not None:
     with tab1:
         st.header("Dataset Preview")
         
-        col1, col2, col3 = st.columns(3)
-        col1.metric("Rows", f"{len(st.session_state.df_original):,}")
-        col2.metric("Columns", f"{len(st.session_state.df_original.columns)}")
-        col3.metric("Size", f"{st.session_state.df_original.memory_usage(deep=True).sum() / (1024*1024):.1f} MB")
+        # Dataset Stats - Card Layout (Single Row)
+        st.markdown(f"""
+        <div style='background: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%); 
+                    padding: 25px; border-radius: 12px; color: white; margin: 15px 0;
+                    box-shadow: 0 4px 15px rgba(15, 118, 110, 0.2);'>
+            <div style='display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px;'>
+                <div style='text-align: center;'>
+                    <div style='font-size: 14px; opacity: 0.9; margin-bottom: 8px;'>📊 Total Rows</div>
+                    <div style='font-size: 32px; font-weight: bold;'>{len(st.session_state.df_original):,}</div>
+                </div>
+                <div style='text-align: center; border-left: 2px solid rgba(255,255,255,0.3); padding-left: 15px;'>
+                    <div style='font-size: 14px; opacity: 0.9; margin-bottom: 8px;'>📝 Total Columns</div>
+                    <div style='font-size: 32px; font-weight: bold;'>{len(st.session_state.df_original.columns)}</div>
+                </div>
+                <div style='text-align: center; border-left: 2px solid rgba(255,255,255,0.3); padding-left: 15px;'>
+                    <div style='font-size: 14px; opacity: 0.9; margin-bottom: 8px;'>💾 Memory Size</div>
+                    <div style='font-size: 32px; font-weight: bold;'>{st.session_state.df_original.memory_usage(deep=True).sum() / (1024*1024):.1f} MB</div>
+                </div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
         
         st.subheader("First 10 Rows")
         st.dataframe(st.session_state.df_original.head(10), use_container_width=True)
@@ -253,20 +317,74 @@ if st.session_state.df_original is not None:
             st.markdown(f"### Dataset Health Score: {score_color} {health_score:.1f}/100")
             st.progress(health_score / 100)
             
-            # Basic info
-            st.subheader("Basic Information")
-            col1, col2, col3, col4 = st.columns(4)
-            col1.metric("Total Rows", f"{overview_data['basic_info']['rows']:,}")
-            col2.metric("Total Columns", overview_data['basic_info']['columns'])
-            col3.metric("Total Cells", f"{overview_data['basic_info']['total_cells']:,}")
-            col4.metric("Memory (MB)", f"{overview_data['memory_usage']['total_mb']:.1f}")
+            # Basic info - Card Layout (Single Row)
+            st.subheader("📋 Basic Information")
+            st.markdown(f"""
+            <div style='background: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%); 
+                        padding: 25px; border-radius: 12px; color: white; margin: 15px 0;
+                        box-shadow: 0 4px 15px rgba(15, 118, 110, 0.2);'>
+                <div style='display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px;'>
+                    <div style='text-align: center;'>
+                        <div style='font-size: 14px; opacity: 0.9; margin-bottom: 8px;'>📊 Total Rows</div>
+                        <div style='font-size: 32px; font-weight: bold;'>{overview_data['basic_info']['rows']:,}</div>
+                    </div>
+                    <div style='text-align: center; border-left: 2px solid rgba(255,255,255,0.3); padding-left: 15px;'>
+                        <div style='font-size: 14px; opacity: 0.9; margin-bottom: 8px;'>📝 Total Columns</div>
+                        <div style='font-size: 32px; font-weight: bold;'>{overview_data['basic_info']['columns']}</div>
+                    </div>
+                    <div style='text-align: center; border-left: 2px solid rgba(255,255,255,0.3); padding-left: 15px;'>
+                        <div style='font-size: 14px; opacity: 0.9; margin-bottom: 8px;'>🔢 Total Cells</div>
+                        <div style='font-size: 32px; font-weight: bold;'>{overview_data['basic_info']['total_cells']:,}</div>
+                    </div>
+                    <div style='text-align: center; border-left: 2px solid rgba(255,255,255,0.3); padding-left: 15px;'>
+                        <div style='font-size: 14px; opacity: 0.9; margin-bottom: 8px;'>💾 Memory Usage</div>
+                        <div style='font-size: 32px; font-weight: bold;'>{overview_data['memory_usage']['total_mb']:.1f} MB</div>
+                    </div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
             
-            # Missing values
-            st.subheader("Missing Values")
-            col1, col2, col3 = st.columns(3)
-            col1.metric("Total Missing", f"{overview_data['missing_values']['total_missing']:,}")
-            col2.metric("Missing %", f"{overview_data['missing_values']['total_missing_pct']:.2f}%")
-            col3.metric("Columns Affected", overview_data['missing_values']['columns_with_missing'])
+            # Missing values - Card Layout with dynamic colors (Single Row)
+            st.subheader("⚠️ Missing Values Summary")
+            
+            # Determine color based on missing percentage
+            missing_pct = overview_data['missing_values']['total_missing_pct']
+            if missing_pct <= 5.0:
+                # Low missing values - Green (Good)
+                gradient_color = "linear-gradient(135deg, #16a34a 0%, #22c55e 100%)"
+                shadow_color = "rgba(22, 163, 74, 0.2)"
+                status_icon = "✅"
+            elif missing_pct <= 20.0:
+                # Moderate missing values - Amber (Warning)
+                gradient_color = "linear-gradient(135deg, #d97706 0%, #f59e0b 100%)"
+                shadow_color = "rgba(217, 119, 6, 0.2)"
+                status_icon = "⚠️"
+            else:
+                # High missing values - Red (Critical)
+                gradient_color = "linear-gradient(135deg, #dc2626 0%, #ef4444 100%)"
+                shadow_color = "rgba(220, 38, 38, 0.2)"
+                status_icon = "🔴"
+            
+            st.markdown(f"""
+            <div style='background: {gradient_color}; 
+                        padding: 25px; border-radius: 12px; color: white; margin: 15px 0;
+                        box-shadow: 0 4px 15px {shadow_color};'>
+                <div style='display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px;'>
+                    <div style='text-align: center;'>
+                        <div style='font-size: 14px; opacity: 0.9; margin-bottom: 8px;'>{status_icon} Total Missing Values</div>
+                        <div style='font-size: 32px; font-weight: bold;'>{overview_data['missing_values']['total_missing']:,}</div>
+                    </div>
+                    <div style='text-align: center; border-left: 2px solid rgba(255,255,255,0.3); padding-left: 15px;'>
+                        <div style='font-size: 14px; opacity: 0.9; margin-bottom: 8px;'>📊 Missing Percentage</div>
+                        <div style='font-size: 32px; font-weight: bold;'>{overview_data['missing_values']['total_missing_pct']:.2f}%</div>
+                    </div>
+                    <div style='text-align: center; border-left: 2px solid rgba(255,255,255,0.3); padding-left: 15px;'>
+                        <div style='font-size: 14px; opacity: 0.9; margin-bottom: 8px;'>📋 Columns Affected</div>
+                        <div style='font-size: 32px; font-weight: bold;'>{overview_data['missing_values']['columns_with_missing']}</div>
+                    </div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
             
             if overview_data['missing_values']['per_column']:
                 missing_df = pd.DataFrame([
@@ -301,15 +419,34 @@ if st.session_state.df_original is not None:
             
             schema_data = st.session_state.schema_data
             
-            # Summary
-            st.subheader("Type Distribution")
+            # Type Distribution - Card Layout (Single Row)
+            st.subheader("📊 Type Distribution")
             summary = schema_data['summary']
             
-            col1, col2, col3, col4 = st.columns(4)
-            col1.metric("Numeric", summary['numeric_columns'])
-            col2.metric("Categorical", summary['categorical_columns'])
-            col3.metric("Datetime", summary['datetime_columns'])
-            col4.metric("Text", summary['text_columns'])
+            st.markdown(f"""
+            <div style='background: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%); 
+                        padding: 25px; border-radius: 12px; color: white; margin: 15px 0;
+                        box-shadow: 0 4px 15px rgba(15, 118, 110, 0.2);'>
+                <div style='display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px;'>
+                    <div style='text-align: center;'>
+                        <div style='font-size: 14px; opacity: 0.9; margin-bottom: 8px;'>🔢 Numeric</div>
+                        <div style='font-size: 32px; font-weight: bold;'>{summary['numeric_columns']}</div>
+                    </div>
+                    <div style='text-align: center; border-left: 2px solid rgba(255,255,255,0.3); padding-left: 15px;'>
+                        <div style='font-size: 14px; opacity: 0.9; margin-bottom: 8px;'>📝 Categorical</div>
+                        <div style='font-size: 32px; font-weight: bold;'>{summary['categorical_columns']}</div>
+                    </div>
+                    <div style='text-align: center; border-left: 2px solid rgba(255,255,255,0.3); padding-left: 15px;'>
+                        <div style='font-size: 14px; opacity: 0.9; margin-bottom: 8px;'>📅 Datetime</div>
+                        <div style='font-size: 32px; font-weight: bold;'>{summary['datetime_columns']}</div>
+                    </div>
+                    <div style='text-align: center; border-left: 2px solid rgba(255,255,255,0.3); padding-left: 15px;'>
+                        <div style='font-size: 14px; opacity: 0.9; margin-bottom: 8px;'>📄 Text</div>
+                        <div style='font-size: 32px; font-weight: bold;'>{summary['text_columns']}</div>
+                    </div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
             
             # Detailed schema - MOVED TO TOP
             st.subheader("Detailed Schema")
