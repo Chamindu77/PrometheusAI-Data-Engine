@@ -588,19 +588,19 @@ if st.session_state.df_original is not None:
                 analysis = col_info.get('analysis', {})
                 
                 if col_type == 'numeric':
-                    col1, col2, col3, col4 = st.columns(4)
-                    col1.metric("Mean", f"{analysis.get('mean', 0):.2f}")
-                    col2.metric("Median", f"{analysis.get('median', 0):.2f}")
-                    col3.metric("Std Dev", f"{analysis.get('std', 0):.2f}")
-                    col4.metric("Missing", f"{analysis.get('missing_pct', 0):.1f}%")
-                    
-                    col1, col2, col3, col4 = st.columns(4)
-                    col1.metric("Min", f"{analysis.get('min', 0):.2f}")
-                    col2.metric("Q1", f"{analysis.get('q1', 0):.2f}")
-                    col3.metric("Q3", f"{analysis.get('q3', 0):.2f}")
-                    col4.metric("Max", f"{analysis.get('max', 0):.2f}")
-                    
-                    st.metric("Outliers (IQR)", f"{analysis.get('outliers_count', 0)} ({analysis.get('outliers_pct', 0):.1f}%)")
+                    # Create table for numeric statistics (statistics as columns)
+                    stats_df = pd.DataFrame([{
+                        "Mean": f"{analysis.get('mean', 0):.2f}",
+                        "Median": f"{analysis.get('median', 0):.2f}",
+                        "Std Dev": f"{analysis.get('std', 0):.2f}",
+                        "Missing %": f"{analysis.get('missing_pct', 0):.1f}%",
+                        "Min": f"{analysis.get('min', 0):.2f}",
+                        "Q1 (25%)": f"{analysis.get('q1', 0):.2f}",
+                        "Q3 (75%)": f"{analysis.get('q3', 0):.2f}",
+                        "Max": f"{analysis.get('max', 0):.2f}",
+                        "Outliers (IQR)": f"{analysis.get('outliers_count', 0)} ({analysis.get('outliers_pct', 0):.1f}%)"
+                    }])
+                    st.dataframe(stats_df, use_container_width=True, hide_index=True)
                 
                 elif col_type == 'categorical':
                     col1, col2, col3 = st.columns(3)
@@ -643,8 +643,9 @@ if st.session_state.df_original is not None:
             
             with col1:
                 st.markdown("""
-                <div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                            padding: 20px; border-radius: 10px; color: white;'>
+                <div style='background: linear-gradient(135deg, #0f766e 70%, #14b8a6 110%); 
+                            padding: 20px; border-radius: 10px; color: white;
+                            box-shadow: 0 4px 15px rgba(15, 118, 110, 0.2);'>
                     <h3>⚡ Quick Mode</h3>
                     <p>One-click automated cleaning with recommended defaults</p>
                     <ul>
@@ -655,14 +656,15 @@ if st.session_state.df_original is not None:
                 </div>
                 """, unsafe_allow_html=True)
                 
-                if st.button("🚀 Start Quick Mode", use_container_width=True, type="primary"):
+                if st.button("🚀 Start Quick Mode", use_container_width=True):
                     WizardStepManager.start_wizard(st.session_state.df_original, mode='quick')
                     st.rerun()
             
             with col2:
                 st.markdown("""
-                <div style='background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); 
-                            padding: 20px; border-radius: 10px; color: white;'>
+                <div style='background: linear-gradient(135deg, #374151 0%, #4b5563 100%); 
+                            padding: 20px; border-radius: 10px; color: white;
+                            box-shadow: 0 4px 15px rgba(55, 65, 81, 0.2);'>
                     <h3>🎯 Advanced Mode</h3>
                     <p>Step-by-step wizard with full control & previews</p>
                     <ul>
@@ -686,6 +688,8 @@ if st.session_state.df_original is not None:
             
             if st.button("↩️ Back to Mode Selection"):
                 WizardStepManager.reset_wizard()
+                if 'data_saved' in st.session_state:
+                    del st.session_state.data_saved
                 st.rerun()
             
             with st.spinner("Executing cleaning pipeline..."):
@@ -794,6 +798,33 @@ if st.session_state.df_original is not None:
                             
                             st.divider()
                     
+                    st.divider()
+                    st.subheader("💾 Save & Visualize")
+                    
+                    # Auto-save to disk (Conditional to prevent infinite loops)
+                    save_path = "cleaned_dataset.csv"
+                    if not st.session_state.get('data_saved'):
+                        st.session_state.df_cleaned.to_csv(save_path, index=False)
+                        st.session_state.data_saved = True
+                        st.session_state.cleaned_file_path = save_path
+                    
+                    col_dl, col_nav = st.columns(2)
+                    
+                    with col_dl:
+                        with open(save_path, "rb") as f:
+                            st.download_button(
+                                label="📥 Download Cleaned Dataset",
+                                data=f,
+                                file_name="cleaned_dataset.csv",
+                                mime="text/csv",
+                                type="primary",
+                                use_column_width=True
+                            )
+                    
+                    with col_nav:
+                        st.success("✅ Dataset saved automatically!")
+                        st.info("👉 **Next Step:** Go to the [📈 EDA Visualizations](#eda-visualizations) tab to visualize this data.")
+                    
                 except Exception as e:
                     st.error(f"❌ Cleaning error: {str(e)}")
         
@@ -826,6 +857,8 @@ if st.session_state.df_original is not None:
             with nav_col3:
                 if st.button("↩️ Reset"):
                     WizardStepManager.reset_wizard()
+                    if 'data_saved' in st.session_state:
+                        del st.session_state.data_saved
                     st.rerun()
             
             st.divider()
@@ -905,7 +938,7 @@ if st.session_state.df_original is not None:
                         ("Unique Rows", "Duplicate Rows"),
                         "Duplicate Analysis"
                     )
-                    st.image(buf, use_container_width=True)
+                    st.image(buf, use_column_width=True)
                     
                     if st.button("✅ Remove Duplicates & Continue", type="primary"):
                         cleaner = transformers.DataCleaner(df)
@@ -960,7 +993,7 @@ if st.session_state.df_original is not None:
                         ("Variable Columns", "Constant Columns"),
                         "Column Analysis"
                     )
-                    st.image(buf, use_container_width=True)
+                    st.image(buf, use_column_width=True)
                     
                     if st.button("✅ Drop Constant Columns & Continue", type="primary"):
                         cleaner = transformers.DataCleaner(df)
@@ -1027,7 +1060,7 @@ if st.session_state.df_original is not None:
                         ylabel="Missing Percentage (%)",
                         top_n=20
                     )
-                    st.image(buf, use_container_width=True)
+                    st.image(buf, use_column_width=True)
                     
                     if high_missing_cols:
                         st.warning(f"⚠️ {len(high_missing_cols)} columns will be dropped")
@@ -1180,7 +1213,7 @@ if st.session_state.df_original is not None:
                             mode_val=mode_val,
                             title=f"Distribution: {selected_col}"
                         )
-                        st.image(buf, use_container_width=True)
+                        st.image(buf, use_column_width=True)
                         
                         # Strategy selection (pre-selected: median)
                         strategy = st.radio(
@@ -1342,7 +1375,7 @@ if st.session_state.df_original is not None:
                             ylabel="Count",
                             top_n=10
                         )
-                        st.image(buf, use_container_width=True)
+                        st.image(buf, use_column_width=True)
                         
                         # Strategy selection (pre-selected: mode)
                         strategy = st.radio(
@@ -1518,7 +1551,7 @@ if st.session_state.df_original is not None:
                             title=f"Box Plot: {selected_col}",
                             outliers_highlighted=True
                         )
-                        st.image(buf, use_container_width=True)
+                        st.image(buf, use_column_width=True)
                         
                         # Selection
                         col1, col2 = st.columns(2)
@@ -1669,7 +1702,7 @@ if st.session_state.df_original is not None:
                         ("Before Optimization", "After Optimization"),
                         "Memory Usage Comparison (MB)"
                     )
-                    st.image(buf, use_container_width=True)
+                    st.image(buf, use_column_width=True)
                     
                     if st.button("✅ Apply Memory Optimization & Complete Wizard", type="primary"):
                         st.session_state.wizard_data = optimized_df
@@ -1731,7 +1764,36 @@ if st.session_state.df_original is not None:
                 
                 if st.button("🔄 Start New Wizard"):
                     WizardStepManager.reset_wizard()
+                    if 'data_saved' in st.session_state:
+                        del st.session_state.data_saved
                     st.rerun()
+
+                st.divider()
+                st.subheader("💾 Save & Visualize")
+                
+                # Auto-save to disk (Conditional to prevent infinite loops)
+                save_path = "cleaned_dataset.csv"
+                if not st.session_state.get('data_saved'):
+                    final_df.to_csv(save_path, index=False)
+                    st.session_state.data_saved = True
+                    st.session_state.cleaned_file_path = save_path
+                
+                col_dl, col_nav = st.columns(2)
+                
+                with col_dl:
+                    with open(save_path, "rb") as f:
+                        st.download_button(
+                            label="📥 Download Cleaned Dataset",
+                            data=f,
+                            file_name="cleaned_dataset.csv",
+                            mime="text/csv",
+                            type="primary",
+                            use_container_width=True
+                        )
+                
+                with col_nav:
+                    st.success("✅ Dataset saved automatically!")
+                    st.info("👉 **Next Step:** Go to the [📈 EDA Visualizations](#eda-visualizations) tab to visualize this data.")
     
     # Tab 6: EDA Visualizations
     with tab6:
