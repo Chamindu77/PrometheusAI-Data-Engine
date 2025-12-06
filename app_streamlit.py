@@ -1866,11 +1866,12 @@ if st.session_state.df_original is not None:
                         )
                         
                         report_path = utils_io.save_report(html_content, filename='eda_report.html')
-                        st.success(f"✅ HTML report saved: {report_path}")
                         
-                        # Show preview
-                        with st.expander("📄 Preview HTML Report"):
-                            st.components.v1.html(html_content, height=600, scrolling=True)
+                        # Store HTML content in session state
+                        st.session_state.html_report_content = html_content
+                        st.session_state.html_report_generated = True
+                        
+                        st.success(f"✅ HTML report saved: {report_path}")
                     
                     else:  # Markdown
                         md_content = report.generate_markdown_report(
@@ -1882,13 +1883,14 @@ if st.session_state.df_original is not None:
                         
                         report_path = utils_io.save_report(md_content, filename='eda_report.md')
                         st.success(f"✅ Markdown report saved: {report_path}")
-                        
-                        # Show preview
-                        with st.expander("📄 Preview Markdown Report"):
-                            st.markdown(md_content)
                 
                 except Exception as e:
                     st.error(f"Report generation error: {str(e)}")
+        
+        # Show HTML preview if report was generated
+        if st.session_state.get('html_report_generated', False) and st.session_state.get('html_report_content'):
+            with st.expander("📄 Preview HTML Report"):
+                st.components.v1.html(st.session_state.html_report_content, height=600, scrolling=True)
     
     # Tab 8: Downloads
     with tab8:
@@ -1929,6 +1931,79 @@ if st.session_state.df_original is not None:
         
         st.divider()
         
+        # PDF Report Download Section
+        st.subheader("📄 PDF Report")
+        
+        # Initialize PDF content in session state if not exists
+        if 'pdf_content' not in st.session_state:
+            st.session_state.pdf_content = None
+        
+        if st.session_state.get('html_report_generated', False):
+            # Generate PDF button
+            if st.button("📥 Generate PDF Report", type="primary", key="gen_pdf_btn"):
+                try:
+                    st.info("🔍 Starting PDF generation process...")
+                    
+                    # Step 1: Verify data availability
+                    st.write("✓ Step 1: Checking data availability...")
+                    if st.session_state.overview_data is None:
+                        st.error("Missing overview data")
+                    if st.session_state.schema_data is None:
+                        st.error("Missing schema data")
+                    if st.session_state.column_analysis_data is None:
+                        st.error("Missing column analysis data")
+                    
+                    # Step 2: Generate PDF
+                    st.write("✓ Step 2: Generating PDF content...")
+                    with st.spinner("Converting HTML to PDF... This may take 10-15 seconds"):
+                        pdf_content = report.generate_pdf_report(
+                            st.session_state.overview_data,
+                            st.session_state.schema_data,
+                            st.session_state.column_analysis_data,
+                            st.session_state.cleaning_log or {},
+                            st.session_state.plot_metadata,
+                            st.session_state.correlation_insights
+                        )
+                        st.write(f"✓ PDF generated: {len(pdf_content)} bytes")
+                        
+                        # Step 3: Save PDF to output folder
+                        st.write("✓ Step 3: Saving PDF to file...")
+                        pdf_path = os.path.join('output', 'eda_report.pdf')
+                        os.makedirs('output', exist_ok=True)
+                        with open(pdf_path, 'wb') as f:
+                            f.write(pdf_content)
+                        st.write(f"✓ PDF saved to: {pdf_path}")
+                        
+                        # Step 4: Store in session state
+                        st.write("✓ Step 4: Storing PDF in session state...")
+                        st.session_state.pdf_content = pdf_content
+                        
+                        st.success(f"✅ PDF report generated successfully! ({len(pdf_content):,} bytes)")
+                        st.balloons()
+                except ImportError as e:
+                    st.error("⚠️ xhtml2pdf is not installed properly.")
+                    st.info("To install xhtml2pdf: `pip install xhtml2pdf`")
+                    st.exception(e)
+                except Exception as e:
+                    st.error(f"❌ PDF generation failed: {str(e)}")
+                    st.info("💡 Try generating the HTML report instead. The PDF feature may have compatibility issues.")
+                    st.exception(e)  # Show full traceback for debugging
+            
+            # Show download button if PDF is available
+            if st.session_state.pdf_content is not None:
+                st.download_button(
+                    label="📥 Download PDF Report",
+                    data=st.session_state.pdf_content,
+                    file_name="eda_report.pdf",
+                    mime="application/pdf",
+                    type="primary",
+                    key="download_pdf_btn"
+                )
+        else:
+            st.info("Generate an HTML report first (Tab 7 - Report) to create a PDF version")
+        
+        st.divider()
+        
         # Bulk download info
         st.subheader("📁 All Outputs")
         st.info("""
@@ -1936,6 +2011,7 @@ if st.session_state.df_original is not None:
         - Cleaned CSV
         - EDA visualizations (PNG)
         - HTML/Markdown reports
+        - PDF report
         - Cleaning log (JSON)
         """)
 

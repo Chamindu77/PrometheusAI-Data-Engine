@@ -10,4 +10,4 @@ uvicorn>=0.24.0
 python-multipart>=0.0.6
 pydantic>=2.0.0
 jinja2>=3.1.2
-weasyprint
+xhtml2pdf>=0.2.11
