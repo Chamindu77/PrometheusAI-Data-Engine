@@ -1,8 +1,8 @@
-# 📊 PrometheusPrep EDA Engine
+# 📊 PrometheusAI Data Engine
 
 **Fully Automated CSV → Cleaned Dataset → EDA Report**
 
-PrometheusPrep EDA Engine is a comprehensive data cleaning and exploratory data analysis automation tool. Upload any CSV file and get instant, professional-grade analysis with cleaned datasets and beautiful visualizations.
+PrometheusAI Data Engine is a comprehensive data cleaning and exploratory data analysis automation tool. Upload any CSV file and get instant, professional-grade analysis with cleaned datasets and beautiful visualizations.
 
 [![Python](https://img.shields.io/badge/Python-3.8%2B-blue)](https://www.python.org/)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.28%2B-FF4B4B)](https://streamlit.io/)
@@ -73,8 +73,8 @@ PrometheusPrep EDA Engine is a comprehensive data cleaning and exploratory data 
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/PrometheusPrep-EDA-Engine.git
-cd PrometheusPrep-EDA-Engine
+git clone https://github.com/yourusername/PrometheusAI-Data-Engine.git
+cd PrometheusAI-Data-Engine
 
 # Create virtual environment (recommended)
 python -m venv venv
@@ -143,7 +143,7 @@ report = requests.get(f'http://localhost:8000/report/{session_id}?format=html')
 ## 📁 Project Structure
 
 ```
-PrometheusPrep-EDA-Engine/
+PrometheusAI-Data-Engine/
 ├── app_streamlit.py        # Streamlit UI
 ├── api_fastapi.py          # FastAPI backend
 ├── cleaner/

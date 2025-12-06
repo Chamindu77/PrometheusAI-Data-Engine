@@ -18,7 +18,7 @@ from utils import io as utils_io
 # Page configuration
 st.set_page_config(
     page_title="PrometheusAI Data Engine",
-    page_icon="🕵🏻‍♀️",
+    page_icon="🔥",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -797,33 +797,7 @@ if st.session_state.df_original is not None:
                                 st.caption("No additional details")
                             
                             st.divider()
-                    
-                    st.divider()
-                    st.subheader("💾 Save & Visualize")
-                    
-                    # Auto-save to disk (Conditional to prevent infinite loops)
-                    save_path = "cleaned_dataset.csv"
-                    if not st.session_state.get('data_saved'):
-                        st.session_state.df_cleaned.to_csv(save_path, index=False)
-                        st.session_state.data_saved = True
-                        st.session_state.cleaned_file_path = save_path
-                    
-                    col_dl, col_nav = st.columns(2)
-                    
-                    with col_dl:
-                        with open(save_path, "rb") as f:
-                            st.download_button(
-                                label="📥 Download Cleaned Dataset",
-                                data=f,
-                                file_name="cleaned_dataset.csv",
-                                mime="text/csv",
-                                type="primary",
-                                use_column_width=True
-                            )
-                    
-                    with col_nav:
-                        st.success("✅ Dataset saved automatically!")
-                        st.info("👉 **Next Step:** Go to the [📈 EDA Visualizations](#eda-visualizations) tab to visualize this data.")
+
                     
                 except Exception as e:
                     st.error(f"❌ Cleaning error: {str(e)}")
@@ -1773,32 +1747,7 @@ if st.session_state.df_original is not None:
                         del st.session_state.data_saved
                     st.rerun()
 
-                st.divider()
-                st.subheader("💾 Save & Visualize")
-                
-                # Auto-save to disk (Conditional to prevent infinite loops)
-                save_path = "cleaned_dataset.csv"
-                if not st.session_state.get('data_saved'):
-                    final_df.to_csv(save_path, index=False)
-                    st.session_state.data_saved = True
-                    st.session_state.cleaned_file_path = save_path
-                
-                col_dl, col_nav = st.columns(2)
-                
-                with col_dl:
-                    with open(save_path, "rb") as f:
-                        st.download_button(
-                            label="📥 Download Cleaned Dataset",
-                            data=f,
-                            file_name="cleaned_dataset.csv",
-                            mime="text/csv",
-                            type="primary",
-                            use_container_width=True
-                        )
-                
-                with col_nav:
-                    st.success("✅ Dataset saved automatically!")
-                    st.info("👉 **Next Step:** Go to the [📈 EDA Visualizations](#eda-visualizations) tab to visualize this data.")
+
     
     # Tab 6: EDA Visualizations
     with tab6:
@@ -1857,15 +1806,23 @@ if st.session_state.df_original is not None:
                 for plot in plots_by_type['outliers']:
                     st.image(plot['filepath'], caption=plot['title'])
             
-            # Sample distributions
+            # Distribution plots - Show all
             if 'distribution' in plots_by_type:
-                st.subheader("Distribution Plots (Sample)")
-                for plot in plots_by_type['distribution'][:5]:
+                st.subheader("Distribution Plots")
+                for plot in plots_by_type['distribution']:
                     st.image(plot['filepath'], caption=plot['title'])
-                
-                remaining = len(plots_by_type['distribution']) - 5
-                if remaining > 0:
-                    st.info(f"... and {remaining} more distribution plots available in output folder")
+            
+            # Categorical plots - Show all
+            if 'categorical' in plots_by_type:
+                st.subheader("Categorical Plots")
+                for plot in plots_by_type['categorical']:
+                    st.image(plot['filepath'], caption=plot['title'])
+            
+            # Pairplot
+            if 'pairplot' in plots_by_type:
+                st.subheader("Pairplot Analysis")
+                for plot in plots_by_type['pairplot']:
+                    st.image(plot['filepath'], caption=plot['title'])
     
     # Tab 7: Report
     with tab7:
@@ -1909,11 +1866,12 @@ if st.session_state.df_original is not None:
                         )
                         
                         report_path = utils_io.save_report(html_content, filename='eda_report.html')
-                        st.success(f"✅ HTML report saved: {report_path}")
                         
-                        # Show preview
-                        with st.expander("📄 Preview HTML Report"):
-                            st.components.v1.html(html_content, height=600, scrolling=True)
+                        # Store HTML content in session state
+                        st.session_state.html_report_content = html_content
+                        st.session_state.html_report_generated = True
+                        
+                        st.success(f"✅ HTML report saved: {report_path}")
                     
                     else:  # Markdown
                         md_content = report.generate_markdown_report(
@@ -1925,13 +1883,14 @@ if st.session_state.df_original is not None:
                         
                         report_path = utils_io.save_report(md_content, filename='eda_report.md')
                         st.success(f"✅ Markdown report saved: {report_path}")
-                        
-                        # Show preview
-                        with st.expander("📄 Preview Markdown Report"):
-                            st.markdown(md_content)
                 
                 except Exception as e:
                     st.error(f"Report generation error: {str(e)}")
+        
+        # Show HTML preview if report was generated
+        if st.session_state.get('html_report_generated', False) and st.session_state.get('html_report_content'):
+            with st.expander("📄 Preview HTML Report"):
+                st.components.v1.html(st.session_state.html_report_content, height=600, scrolling=True)
     
     # Tab 8: Downloads
     with tab8:
@@ -1972,6 +1931,79 @@ if st.session_state.df_original is not None:
         
         st.divider()
         
+        # PDF Report Download Section
+        st.subheader("📄 PDF Report")
+        
+        # Initialize PDF content in session state if not exists
+        if 'pdf_content' not in st.session_state:
+            st.session_state.pdf_content = None
+        
+        if st.session_state.get('html_report_generated', False):
+            # Generate PDF button
+            if st.button("📥 Generate PDF Report", type="primary", key="gen_pdf_btn"):
+                try:
+                    st.info("🔍 Starting PDF generation process...")
+                    
+                    # Step 1: Verify data availability
+                    st.write("✓ Step 1: Checking data availability...")
+                    if st.session_state.overview_data is None:
+                        st.error("Missing overview data")
+                    if st.session_state.schema_data is None:
+                        st.error("Missing schema data")
+                    if st.session_state.column_analysis_data is None:
+                        st.error("Missing column analysis data")
+                    
+                    # Step 2: Generate PDF
+                    st.write("✓ Step 2: Generating PDF content...")
+                    with st.spinner("Converting HTML to PDF... This may take 10-15 seconds"):
+                        pdf_content = report.generate_pdf_report(
+                            st.session_state.overview_data,
+                            st.session_state.schema_data,
+                            st.session_state.column_analysis_data,
+                            st.session_state.cleaning_log or {},
+                            st.session_state.plot_metadata,
+                            st.session_state.correlation_insights
+                        )
+                        st.write(f"✓ PDF generated: {len(pdf_content)} bytes")
+                        
+                        # Step 3: Save PDF to output folder
+                        st.write("✓ Step 3: Saving PDF to file...")
+                        pdf_path = os.path.join('output', 'eda_report.pdf')
+                        os.makedirs('output', exist_ok=True)
+                        with open(pdf_path, 'wb') as f:
+                            f.write(pdf_content)
+                        st.write(f"✓ PDF saved to: {pdf_path}")
+                        
+                        # Step 4: Store in session state
+                        st.write("✓ Step 4: Storing PDF in session state...")
+                        st.session_state.pdf_content = pdf_content
+                        
+                        st.success(f"✅ PDF report generated successfully! ({len(pdf_content):,} bytes)")
+                        st.balloons()
+                except ImportError as e:
+                    st.error("⚠️ xhtml2pdf is not installed properly.")
+                    st.info("To install xhtml2pdf: `pip install xhtml2pdf`")
+                    st.exception(e)
+                except Exception as e:
+                    st.error(f"❌ PDF generation failed: {str(e)}")
+                    st.info("💡 Try generating the HTML report instead. The PDF feature may have compatibility issues.")
+                    st.exception(e)  # Show full traceback for debugging
+            
+            # Show download button if PDF is available
+            if st.session_state.pdf_content is not None:
+                st.download_button(
+                    label="📥 Download PDF Report",
+                    data=st.session_state.pdf_content,
+                    file_name="eda_report.pdf",
+                    mime="application/pdf",
+                    type="primary",
+                    key="download_pdf_btn"
+                )
+        else:
+            st.info("Generate an HTML report first (Tab 7 - Report) to create a PDF version")
+        
+        st.divider()
+        
         # Bulk download info
         st.subheader("📁 All Outputs")
         st.info("""
@@ -1979,6 +2011,7 @@ if st.session_state.df_original is not None:
         - Cleaned CSV
         - EDA visualizations (PNG)
         - HTML/Markdown reports
+        - PDF report
         - Cleaning log (JSON)
         """)
 
