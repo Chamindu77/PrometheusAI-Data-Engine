@@ -133,11 +133,11 @@ if 'selected_conversions' not in st.session_state:
 
 
 # Header
-st.markdown('<div class="main-header">📊 PrometheusAI Data Engine</div>', unsafe_allow_html=True)
-st.markdown(
-    '<div class="sub-header">Automated Data Preparation, EDA & AI-Powered Insight Engine</div>',
-    unsafe_allow_html=True
-)
+# st.markdown('<div class="main-header">📊 PrometheusAI Data Engine</div>', unsafe_allow_html=True)
+# st.markdown(
+#     '<div class="sub-header">Automated Data Preparation, EDA & AI-Powered Insight Engine</div>',
+#     unsafe_allow_html=True
+# )
 
 
 # Sidebar
@@ -2032,37 +2032,293 @@ if st.session_state.df_original is not None:
             """)
 
 else:
-    # Landing page
-    st.info("👈 Upload a CSV file in the sidebar to get started")
-
+    # Professional Landing Page
+    
+    # Hero Section
     st.markdown("""
-    ### 🚀 Features
+    <div style='background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%); 
+                padding: 60px 40px; border-radius: 20px; text-align: center; 
+                box-shadow: 0 20px 60px rgba(15, 23, 42, 0.4); margin-bottom: 40px;'>
+        <h1 style='color: white; font-size: 48px; font-weight: 800; margin-bottom: 16px; 
+                   text-shadow: 2px 2px 4px rgba(0,0,0,0.2);'>
+            🔥 PrometheusAI Data Engine
+        </h1>
+        <p style='color: #e0e7ff; font-size: 20px; margin-bottom: 30px; font-weight: 300;'>
+            Automated Data Preparation, EDA & AI-Powered Insight Engine
+        </p>
+        <div style='background: rgba(255,255,255,0.1); padding: 20px; border-radius: 12px; 
+                    backdrop-filter: blur(10px); display: inline-block;'>
+            <p style='color: white; font-size: 16px; margin: 0;'>
+                👈 <strong>Upload a CSV file in the sidebar to get started</strong>
+            </p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
     
-    - **Automated Data Cleaning**: Handle missing values, duplicates, outliers
-    - **Schema Inference**: Intelligent type detection and conversion
-    - **Column Analysis**: Detailed statistics for every feature
-    - **Visual EDA**: Comprehensive visualizations (distributions, correlations, outliers)
-    - **Professional Reports**: Generate HTML/Markdown reports
-    - **Memory Optimization**: Reduce dataset size through dtype optimization
-    - **Full Auto Mode**: Execute entire pipeline with one click
+    # Workflow Modes Section
+    st.markdown("<h2 style='margin-bottom: 24px; font-weight: 700;'>🌟 Choose Your Workflow</h2>", unsafe_allow_html=True)
     
-    ### 📊 Supported Analysis
+    col1, col2, col3, col4 = st.columns(4)
     
-    1. Dataset Overview & Health Scoring
-    2. Missing Value Analysis
-    3. Duplicate Detection
-    4. Outlier Detection (IQR & Z-score)
-    5. Correlation Analysis
-    6. Distribution Analysis
-    7. Data Type Optimization
+    with col1:
+        st.markdown("""
+        <div style='background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); 
+                    padding: 24px; border-radius: 16px; height: 200px;
+                    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.25);
+                    transition: transform 0.3s;'>
+            <div style='font-size: 40px; margin-bottom: 12px;'>🤖</div>
+            <h3 style='color: white; font-size: 18px; font-weight: 700; margin-bottom: 8px;'>AI Agent</h3>
+            <p style='color: #e0e7ff; font-size: 13px; line-height: 1.5;'>
+                Chat with your data in natural language and get instant insights
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
     
-    ### 🎯 Quick Start
+    with col2:
+        st.markdown("""
+        <div style='background: linear-gradient(135deg, #10b981 0%, #059669 100%); 
+                    padding: 24px; border-radius: 16px; height: 200px;
+                    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.25);'>
+            <div style='font-size: 40px; margin-bottom: 12px;'>⚡</div>
+            <h3 style='color: white; font-size: 18px; font-weight: 700; margin-bottom: 8px;'>Quick Wizard</h3>
+            <p style='color: #d1fae5; font-size: 13px; line-height: 1.5;'>
+                One-click automated cleaning with best practices
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
     
-    1. Upload your CSV file
-    2. Choose between manual configuration or Full Auto Mode
-    3. View analysis results in interactive tabs
-    4. Download cleaned data and reports
-    """)
+    with col3:
+        st.markdown("""
+        <div style='background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); 
+                    padding: 24px; border-radius: 16px; height: 200px;
+                    box-shadow: 0 8px 24px rgba(245, 158, 11, 0.25);'>
+            <div style='font-size: 40px; margin-bottom: 12px;'>🎯</div>
+            <h3 style='color: white; font-size: 18px; font-weight: 700; margin-bottom: 8px;'>Advanced Wizard</h3>
+            <p style='color: #fef3c7; font-size: 13px; line-height: 1.5;'>
+                Step-by-step control with column-by-column customization
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col4:
+        st.markdown("""
+        <div style='background: linear-gradient(135deg, #64748b 0%, #475569 100%); 
+                    padding: 24px; border-radius: 16px; height: 200px;
+                    box-shadow: 0 8px 24px rgba(100, 116, 139, 0.25);'>
+            <div style='font-size: 40px; margin-bottom: 12px;'>🔧</div>
+            <h3 style='color: white; font-size: 18px; font-weight: 700; margin-bottom: 8px;'>Manual Mode</h3>
+            <p style='color: #e2e8f0; font-size: 13px; line-height: 1.5;'>
+                Full customization of every analysis step
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    st.markdown("<div style='margin: 48px 0;'></div>", unsafe_allow_html=True)
+    
+    # Key Features Section
+    st.markdown("<h2 style='margin-bottom: 24px; font-weight: 700;'>🚀 Powerful Features</h2>", unsafe_allow_html=True)
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("""
+        <div style='background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 24px; border-radius: 12px; margin-bottom: 16px;
+                    border-left: 4px solid #6366f1; box-shadow: 0 8px 24px rgba(99, 102, 241, 0.2);'>
+            <h4 style='color: #e0e7ff; margin-bottom: 8px; font-weight: 600;'>🤖 AI-Powered Chat Agent</h4>
+            <p style='color: #cbd5e1; font-size: 14px; margin: 0;'>
+                Ask questions in natural language and get instant insights with auto-generated visualizations
+            </p>
+        </div>
+        
+        <div style='background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 24px; border-radius: 12px; margin-bottom: 16px;
+                    border-left: 4px solid #10b981; box-shadow: 0 8px 24px rgba(16, 185, 129, 0.2);'>
+            <h4 style='color: #d1fae5; margin-bottom: 8px; font-weight: 600;'>🧹 Automated Data Cleaning</h4>
+            <p style='color: #cbd5e1; font-size: 14px; margin: 0;'>
+                Handle missing values, duplicates, and outliers with intelligent strategies
+            </p>
+        </div>
+        
+        <div style='background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 24px; border-radius: 12px; margin-bottom: 16px;
+                    border-left: 4px solid #f59e0b; box-shadow: 0 8px 24px rgba(245, 158, 11, 0.2);'>
+            <h4 style='color: #fef3c7; margin-bottom: 8px; font-weight: 600;'>🔍 Schema Inference</h4>
+            <p style='color: #cbd5e1; font-size: 14px; margin: 0;'>
+                Intelligent type detection with confidence scores and selective conversion
+            </p>
+        </div>
+        
+        <div style='background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 24px; border-radius: 12px; margin-bottom: 16px;
+                    border-left: 4px solid #8b5cf6; box-shadow: 0 8px 24px rgba(139, 92, 246, 0.2);'>
+            <h4 style='color: #f3e8ff; margin-bottom: 8px; font-weight: 600;'>📊 Column Analysis</h4>
+            <p style='color: #cbd5e1; font-size: 14px; margin: 0;'>
+                Detailed statistics for numeric, categorical, datetime, and text features
+            </p>
+        </div>
+        
+        <div style='background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 24px; border-radius: 12px; margin-bottom: 16px;
+                    border-left: 4px solid #ec4899; box-shadow: 0 8px 24px rgba(236, 72, 153, 0.2);'>
+            <h4 style='color: #fce7f3; margin-bottom: 8px; font-weight: 600;'>📈 Visual EDA</h4>
+            <p style='color: #cbd5e1; font-size: 14px; margin: 0;'>
+                Comprehensive visualizations including distributions, correlations, and pair plots
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col2:
+        st.markdown("""
+        <div style='background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 24px; border-radius: 12px; margin-bottom: 16px;
+                    border-left: 4px solid #06b6d4; box-shadow: 0 8px 24px rgba(6, 182, 212, 0.2);'>
+            <h4 style='color: #cffafe; margin-bottom: 8px; font-weight: 600;'>📄 Professional Reports</h4>
+            <p style='color: #cbd5e1; font-size: 14px; margin: 0;'>
+                Generate beautiful HTML/Markdown/PDF reports with embedded charts
+            </p>
+        </div>
+        
+        <div style='background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 24px; border-radius: 12px; margin-bottom: 16px;
+                    border-left: 4px solid #14b8a6; box-shadow: 0 8px 24px rgba(20, 184, 166, 0.2);'>
+            <h4 style='color: #ccfbf1; margin-bottom: 8px; font-weight: 600;'>💾 Memory Optimization</h4>
+            <p style='color: #cbd5e1; font-size: 14px; margin: 0;'>
+                Reduce dataset size by 30-70% through intelligent dtype optimization
+            </p>
+        </div>
+        
+        <div style='background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 24px; border-radius: 12px; margin-bottom: 16px;
+                    border-left: 4px solid #84cc16; box-shadow: 0 8px 24px rgba(132, 204, 22, 0.2);'>
+            <h4 style='color: #ecfccb; margin-bottom: 8px; font-weight: 600;'>🎯 Data Cleaning Wizard</h4>
+            <p style='color: #cbd5e1; font-size: 14px; margin: 0;'>
+                Choose between Quick Mode (one-click) or Advanced Mode (step-by-step)
+            </p>
+        </div>
+        
+        <div style='background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 24px; border-radius: 12px; margin-bottom: 16px;
+                    border-left: 4px solid #f97316; box-shadow: 0 8px 24px rgba(249, 115, 22, 0.2);'>
+            <h4 style='color: #fed7aa; margin-bottom: 8px; font-weight: 600;'>⚡ Full Auto Mode</h4>
+            <p style='color: #cbd5e1; font-size: 14px; margin: 0;'>
+                Execute the entire pipeline with one click for rapid results
+            </p>
+        </div>
+        
+        <div style='background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 24px; border-radius: 12px; margin-bottom: 16px;
+                    border-left: 4px solid #ef4444; box-shadow: 0 8px 24px rgba(239, 68, 68, 0.2);'>
+            <h4 style='color: #fecaca; margin-bottom: 8px; font-weight: 600;'>🔬 Advanced Analytics</h4>
+            <p style='color: #cbd5e1; font-size: 14px; margin: 0;'>
+                Outlier detection, correlation analysis, and distribution insights
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    st.markdown("<div style='margin: 48px 0;'></div>", unsafe_allow_html=True)
+    
+    # Analysis Capabilities
+    st.markdown("<h2 style='margin-bottom: 24px; font-weight: 700;'>📊 Comprehensive Analysis</h2>", unsafe_allow_html=True)
+    
+    st.markdown("""
+    <div style='background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); 
+                padding: 32px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.3);'>
+        <div style='display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;'>
+            <div style='background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.2);'>
+                <div style='color: #818cf8; font-size: 24px; margin-bottom: 8px;'>📋</div>
+                <h4 style='color: #e0e7ff; font-size: 15px; font-weight: 600; margin-bottom: 4px;'>Dataset Overview</h4>
+                <p style='color: #cbd5e1; font-size: 13px; margin: 0;'>Health scoring & quality assessment</p>
+            </div>
+            <div style='background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.2);'>
+                <div style='color: #34d399; font-size: 24px; margin-bottom: 8px;'>⚠️</div>
+                <h4 style='color: #d1fae5; font-size: 15px; font-weight: 600; margin-bottom: 4px;'>Missing Values</h4>
+                <p style='color: #cbd5e1; font-size: 13px; margin: 0;'>Visual patterns & smart imputation</p>
+            </div>
+            <div style='background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.2);'>
+                <div style='color: #fbbf24; font-size: 24px; margin-bottom: 8px;'>🔍</div>
+                <h4 style='color: #fef3c7; font-size: 15px; font-weight: 600; margin-bottom: 4px;'>Duplicate Detection</h4>
+                <p style='color: #cbd5e1; font-size: 13px; margin: 0;'>Automatic identification & removal</p>
+            </div>
+            <div style='background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.2);'>
+                <div style='color: #a78bfa; font-size: 24px; margin-bottom: 8px;'>📊</div>
+                <h4 style='color: #f3e8ff; font-size: 15px; font-weight: 600; margin-bottom: 4px;'>Outlier Detection</h4>
+                <p style='color: #cbd5e1; font-size: 13px; margin: 0;'>IQR & Z-score methods</p>
+            </div>
+            <div style='background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(236, 72, 153, 0.15); border: 1px solid rgba(236, 72, 153, 0.2);'>
+                <div style='color: #f472b6; font-size: 24px; margin-bottom: 8px;'>🔗</div>
+                <h4 style='color: #fce7f3; font-size: 15px; font-weight: 600; margin-bottom: 4px;'>Correlation Analysis</h4>
+                <p style='color: #cbd5e1; font-size: 13px; margin: 0;'>Heatmaps & insights</p>
+            </div>
+            <div style='background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(6, 182, 212, 0.15); border: 1px solid rgba(6, 182, 212, 0.2);'>
+                <div style='color: #22d3ee; font-size: 24px; margin-bottom: 8px;'>📈</div>
+                <h4 style='color: #cffafe; font-size: 15px; font-weight: 600; margin-bottom: 4px;'>Distribution Analysis</h4>
+                <p style='color: #cbd5e1; font-size: 13px; margin: 0;'>Histograms, KDE & box plots</p>
+            </div>
+            <div style='background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(20, 184, 166, 0.15); border: 1px solid rgba(20, 184, 166, 0.2);'>
+                <div style='color: #2dd4bf; font-size: 24px; margin-bottom: 8px;'>🔧</div>
+                <h4 style='color: #ccfbf1; font-size: 15px; font-weight: 600; margin-bottom: 4px;'>Type Optimization</h4>
+                <p style='color: #cbd5e1; font-size: 13px; margin: 0;'>Automatic downcasting</p>
+            </div>
+            <div style='background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(132, 204, 22, 0.15); border: 1px solid rgba(132, 204, 22, 0.2);'>
+                <div style='color: #a3e635; font-size: 24px; margin-bottom: 8px;'>🤖</div>
+                <h4 style='color: #ecfccb; font-size: 15px; font-weight: 600; margin-bottom: 4px;'>AI-Powered Insights</h4>
+                <p style='color: #cbd5e1; font-size: 13px; margin: 0;'>Natural language queries</p>
+            </div>
+            <div style='background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(249, 115, 22, 0.15); border: 1px solid rgba(249, 115, 22, 0.2);'>
+                <div style='color: #fb923c; font-size: 24px; margin-bottom: 8px;'>💬</div>
+                <h4 style='color: #fed7aa; font-size: 15px; font-weight: 600; margin-bottom: 4px;'>Interactive Exploration</h4>
+                <p style='color: #cbd5e1; font-size: 13px; margin: 0;'>Chat with your data</p>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("<div style='margin: 48px 0;'></div>", unsafe_allow_html=True)
+    
+    # Quick Start Guide
+    st.markdown("<h2 style='margin-bottom: 24px; font-weight: 700;'>🎯 Quick Start Guide</h2>", unsafe_allow_html=True)
+    
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.markdown("""
+        <div style='background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 24px; border-radius: 12px; text-align: center;
+                    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.2); border-top: 4px solid #6366f1;'>
+            <div style='background: rgba(99, 102, 241, 0.2); width: 48px; height: 48px; border-radius: 50%; 
+                        display: flex; align-items: center; justify-content: center; 
+                        margin: 0 auto 16px; font-size: 24px; font-weight: 700; color: #818cf8;'>1</div>
+            <h4 style='color: #e0e7ff; font-size: 16px; font-weight: 600; margin-bottom: 8px;'>Upload CSV</h4>
+            <p style='color: #cbd5e1; font-size: 13px; margin: 0;'>Use the sidebar uploader</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col2:
+        st.markdown("""
+        <div style='background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 24px; border-radius: 12px; text-align: center;
+                    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.2); border-top: 4px solid #10b981;'>
+            <div style='background: rgba(16, 185, 129, 0.2); width: 48px; height: 48px; border-radius: 50%; 
+                        display: flex; align-items: center; justify-content: center; 
+                        margin: 0 auto 16px; font-size: 24px; font-weight: 700; color: #34d399;'>2</div>
+            <h4 style='color: #d1fae5; font-size: 16px; font-weight: 600; margin-bottom: 8px;'>Choose Workflow</h4>
+            <p style='color: #cbd5e1; font-size: 13px; margin: 0;'>Select your preferred mode</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col3:
+        st.markdown("""
+        <div style='background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 24px; border-radius: 12px; text-align: center;
+                    box-shadow: 0 8px 24px rgba(245, 158, 11, 0.2); border-top: 4px solid #f59e0b;'>
+            <div style='background: rgba(245, 158, 11, 0.2); width: 48px; height: 48px; border-radius: 50%; 
+                        display: flex; align-items: center; justify-content: center; 
+                        margin: 0 auto 16px; font-size: 24px; font-weight: 700; color: #fbbf24;'>3</div>
+            <h4 style='color: #fef3c7; font-size: 16px; font-weight: 600; margin-bottom: 8px;'>Analyze Data</h4>
+            <p style='color: #cbd5e1; font-size: 13px; margin: 0;'>View interactive results</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col4:
+        st.markdown("""
+        <div style='background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 24px; border-radius: 12px; text-align: center;
+                    box-shadow: 0 8px 24px rgba(139, 92, 246, 0.2); border-top: 4px solid #8b5cf6;'>
+            <div style='background: rgba(139, 92, 246, 0.2); width: 48px; height: 48px; border-radius: 50%; 
+                        display: flex; align-items: center; justify-content: center; 
+                        margin: 0 auto 16px; font-size: 24px; font-weight: 700; color: #a78bfa;'>4</div>
+            <h4 style='color: #f3e8ff; font-size: 16px; font-weight: 600; margin-bottom: 8px;'>Download Results</h4>
+            <p style='color: #cbd5e1; font-size: 13px; margin: 0;'>Get cleaned data & reports</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
 
 
 # Footer

@@ -3,6 +3,8 @@ import pandas as pd
 import re
 import matplotlib.pyplot as plt
 import seaborn as sns
+import io
+import contextlib
 from agent.core import DataAgent
 
 def extract_code(text):
@@ -144,7 +146,8 @@ def render_agent_tab(df: pd.DataFrame):
                             with st.expander("📝 Executed Code", expanded=False):
                                 st.code(code, language='python')
                             
-                            # Execute code
+                            # Execute code with stdout capture
+                            output_buffer = io.StringIO()
                             local_scope = {
                                 "df": df,
                                 "pd": pd,
@@ -153,10 +156,31 @@ def render_agent_tab(df: pd.DataFrame):
                                 "st": st
                             }
                             
-                            exec(code, {}, local_scope)
+                            with contextlib.redirect_stdout(output_buffer):
+                                exec(code, {}, local_scope)
                             
+                            start_output = output_buffer.getvalue()
+                            
+                            # Priority 1: Check for Figure/Dataframe in 'fig'
                             if "fig" in local_scope:
-                                st.pyplot(local_scope["fig"], use_container_width=False) # Reduced width
+                                fig_obj = local_scope["fig"]
+                                if fig_obj is not None:
+                                    if hasattr(fig_obj, 'figure'): # Matplotlib Axes
+                                         st.pyplot(fig_obj.figure, use_container_width=False)
+                                    elif isinstance(fig_obj, (pd.DataFrame, pd.Series)):
+                                         st.dataframe(fig_obj, use_container_width=True)
+                                    elif hasattr(fig_obj, 'savefig'): # Matplotlib Figure
+                                         st.pyplot(fig_obj, use_container_width=False)
+                                    else:
+                                         # Generic object (e.g. text/string/list)
+                                         st.write(fig_obj)
+                                elif start_output:
+                                    # 'fig' is None, but we have print output
+                                    st.text(start_output)
+                            
+                            # Priority 2: If no 'fig' defined, but we have print output
+                            elif start_output:
+                                st.text(start_output)
                                 
                         except Exception as e:
                             st.error(f"Error executing code: {e}") 
