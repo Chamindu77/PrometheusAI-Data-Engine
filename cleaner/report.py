@@ -15,6 +15,25 @@ def escape_html(text: str) -> str:
     return str(text).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
 
 
+def image_to_base64(filepath: str) -> str:
+    """
+    Convert image file to base64 data URI for embedding in HTML
+    
+    Args:
+        filepath: Path to the image file
+        
+    Returns:
+        Base64-encoded data URI or empty string if file cannot be read
+    """
+    try:
+        with open(filepath, 'rb') as f:
+            img_data = base64.b64encode(f.read()).decode('utf-8')
+        return f"data:image/png;base64,{img_data}"
+    except Exception as e:
+        print(f"Warning: Could not encode image {filepath}: {e}")
+        return ""
+
+
 def get_health_score_color(score: float) -> str:
     """Get color based on health score"""
     if score >= 80:
@@ -269,32 +288,36 @@ def generate_html_report(
             </div>
             
             <h2>1. Executive Summary</h2>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-label">Total Rows</div>
-                    <div class="stat-value">{overview['basic_info']['rows']:,}</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Total Columns</div>
-                    <div class="stat-value">{overview['basic_info']['columns']}</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Memory Usage</div>
-                    <div class="stat-value">{overview['memory_usage']['total_mb']:.1f} MB</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Missing Values</div>
-                    <div class="stat-value">{overview['missing_values']['total_missing_pct']:.1f}%</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Duplicate Rows</div>
-                    <div class="stat-value">{overview['duplicates']['total_duplicates']:,}</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Numeric Features</div>
-                    <div class="stat-value">{schema['summary']['numeric_columns']}</div>
-                </div>
-            </div>
+            <table style="width: 100%; border-collapse: separate; border-spacing: 15px; margin: 20px 0;">
+                <tr>
+                    <td style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #3498db; width: 33%;">
+                        <div style="color: #666; font-size: 14px; margin-bottom: 5px;">Total Rows</div>
+                        <div style="color: #2c3e50; font-size: 28px; font-weight: bold;">{overview['basic_info']['rows']:,}</div>
+                    </td>
+                    <td style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #3498db; width: 33%;">
+                        <div style="color: #666; font-size: 14px; margin-bottom: 5px;">Total Columns</div>
+                        <div style="color: #2c3e50; font-size: 28px; font-weight: bold;">{overview['basic_info']['columns']}</div>
+                    </td>
+                    <td style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #3498db; width: 33%;">
+                        <div style="color: #666; font-size: 14px; margin-bottom: 5px;">Memory Usage</div>
+                        <div style="color: #2c3e50; font-size: 28px; font-weight: bold;">{overview['memory_usage']['total_mb']:.1f} MB</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #3498db;">
+                        <div style="color: #666; font-size: 14px; margin-bottom: 5px;">Missing Values</div>
+                        <div style="color: #2c3e50; font-size: 28px; font-weight: bold;">{overview['missing_values']['total_missing_pct']:.1f}%</div>
+                    </td>
+                    <td style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #3498db;">
+                        <div style="color: #666; font-size: 14px; margin-bottom: 5px;">Duplicate Rows</div>
+                        <div style="color: #2c3e50; font-size: 28px; font-weight: bold;">{overview['duplicates']['total_duplicates']:,}</div>
+                    </td>
+                    <td style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #3498db;">
+                        <div style="color: #666; font-size: 14px; margin-bottom: 5px;">Numeric Features</div>
+                        <div style="color: #2c3e50; font-size: 28px; font-weight: bold;">{schema['summary']['numeric_columns']}</div>
+                    </td>
+                </tr>
+            </table>
     """
     
     # Warnings section
@@ -440,33 +463,33 @@ def generate_html_report(
             if plot_type in plots_by_type:
                 html += f"<h3>{plot_type.replace('_', ' ').title()}</h3>"
                 for plot in plots_by_type[plot_type]:
-                    html += f"""
-                    <div class="plot-container">
-                        <h4>{escape_html(plot['title'])}</h4>
-                        <img src="{escape_html(plot['filename'])}" alt="{escape_html(plot['title'])}">
-                    </div>
-                    """
+                    img_src = image_to_base64(plot.get('filepath', ''))
+                    if img_src:
+                        html += f"""
+                        <div class="plot-container">
+                            <h4>{escape_html(plot['title'])}</h4>
+                            <img src="{img_src}" alt="{escape_html(plot['title'])}">
+                        </div>
+                        """
         
-        # Show sample of other plots
+        # Show all other plots
         for plot_type in ['distribution', 'categorical']:
             if plot_type in plots_by_type:
-                html += f"<h3>{plot_type.title()} Plots (Sample)</h3>"
-                for plot in plots_by_type[plot_type][:5]:  # Show first 5
-                    html += f"""
-                    <div class="plot-container">
-                        <h4>{escape_html(plot['title'])}</h4>
-                        <img src="{escape_html(plot['filename'])}" alt="{escape_html(plot['title'])}">
-                    </div>
-                    """
-                
-                remaining = len(plots_by_type[plot_type]) - 5
-                if remaining > 0:
-                    html += f"<p><em>... and {remaining} more {plot_type} plots (see output folder)</em></p>"
+                html += f"<h3>{plot_type.title()} Plots</h3>"
+                for plot in plots_by_type[plot_type]:
+                    img_src = image_to_base64(plot.get('filepath', ''))
+                    if img_src:
+                        html += f"""
+                        <div class="plot-container">
+                            <h4>{escape_html(plot['title'])}</h4>
+                            <img src="{img_src}" alt="{escape_html(plot['title'])}">
+                        </div>
+                        """
     
     # Footer
     html += f"""
             <div class="timestamp">
-                <p>Report generated by EDA Engine on {timestamp}</p>
+                <p>Report generated by PrometheusAI Data Engine on {timestamp}</p>
             </div>
         </div>
     </body>
@@ -554,6 +577,63 @@ def generate_markdown_report(
             action_name = action.get('action', 'Unknown')
             md += f"{idx}. **{action_name}**\n"
     
-    md += f"\n---\n\n*Report generated by EDA Engine on {timestamp}*\n"
+    md += f"\n---\n\n*Report generated by PrometheusAI Data Engine on {timestamp}*\n"
     
     return md
+
+
+def generate_pdf_report(
+    overview: Dict[str, Any],
+    schema: Dict[str, Any],
+    column_analysis: Dict[str, Dict[str, Any]],
+    cleaning_log: Dict[str, Any],
+    plot_metadata: List[Dict[str, str]],
+    correlation_insights: Dict[str, Any] = None
+) -> bytes:
+    """
+    Generate PDF report from HTML using xhtml2pdf
+    
+    Args:
+        overview: Dataset overview from overview.py
+        schema: Schema information from schema_infer.py
+        column_analysis: Column-wise analysis
+        cleaning_log: Cleaning operations log
+        plot_metadata: List of plot metadata
+        correlation_insights: Correlation analysis results
+        
+    Returns:
+        PDF content as bytes
+    """
+    try:
+        from xhtml2pdf import pisa
+        from io import BytesIO
+        
+        # Generate HTML content (reuse existing function)
+        html_content = generate_html_report(
+            overview,
+            schema,
+            column_analysis,
+            cleaning_log,
+            plot_metadata,
+            correlation_insights
+        )
+        
+        # Convert HTML to PDF using xhtml2pdf
+        pdf_file = BytesIO()
+        pisa_status = pisa.CreatePDF(
+            html_content,
+            dest=pdf_file
+        )
+        
+        # Check for errors
+        if pisa_status.err:
+            raise Exception(f"PDF generation had {pisa_status.err} error(s)")
+        
+        pdf_file.seek(0)
+        return pdf_file.getvalue()
+        
+    except ImportError:
+        raise ImportError("xhtml2pdf is required for PDF generation. Install it with: pip install xhtml2pdf")
+    except Exception as e:
+        raise Exception(f"PDF generation failed: {str(e)}")
+
