@@ -18,7 +18,7 @@ from utils import io as utils_io
 # Page configuration
 st.set_page_config(
     page_title="PrometheusAI Data Engine",
-    page_icon="🕵🏻‍♀️",
+    page_icon="🔥",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -797,33 +797,7 @@ if st.session_state.df_original is not None:
                                 st.caption("No additional details")
                             
                             st.divider()
-                    
-                    st.divider()
-                    st.subheader("💾 Save & Visualize")
-                    
-                    # Auto-save to disk (Conditional to prevent infinite loops)
-                    save_path = "cleaned_dataset.csv"
-                    if not st.session_state.get('data_saved'):
-                        st.session_state.df_cleaned.to_csv(save_path, index=False)
-                        st.session_state.data_saved = True
-                        st.session_state.cleaned_file_path = save_path
-                    
-                    col_dl, col_nav = st.columns(2)
-                    
-                    with col_dl:
-                        with open(save_path, "rb") as f:
-                            st.download_button(
-                                label="📥 Download Cleaned Dataset",
-                                data=f,
-                                file_name="cleaned_dataset.csv",
-                                mime="text/csv",
-                                type="primary",
-                                use_column_width=True
-                            )
-                    
-                    with col_nav:
-                        st.success("✅ Dataset saved automatically!")
-                        st.info("👉 **Next Step:** Go to the [📈 EDA Visualizations](#eda-visualizations) tab to visualize this data.")
+
                     
                 except Exception as e:
                     st.error(f"❌ Cleaning error: {str(e)}")
@@ -1773,32 +1747,7 @@ if st.session_state.df_original is not None:
                         del st.session_state.data_saved
                     st.rerun()
 
-                st.divider()
-                st.subheader("💾 Save & Visualize")
-                
-                # Auto-save to disk (Conditional to prevent infinite loops)
-                save_path = "cleaned_dataset.csv"
-                if not st.session_state.get('data_saved'):
-                    final_df.to_csv(save_path, index=False)
-                    st.session_state.data_saved = True
-                    st.session_state.cleaned_file_path = save_path
-                
-                col_dl, col_nav = st.columns(2)
-                
-                with col_dl:
-                    with open(save_path, "rb") as f:
-                        st.download_button(
-                            label="📥 Download Cleaned Dataset",
-                            data=f,
-                            file_name="cleaned_dataset.csv",
-                            mime="text/csv",
-                            type="primary",
-                            use_container_width=True
-                        )
-                
-                with col_nav:
-                    st.success("✅ Dataset saved automatically!")
-                    st.info("👉 **Next Step:** Go to the [📈 EDA Visualizations](#eda-visualizations) tab to visualize this data.")
+
     
     # Tab 6: EDA Visualizations
     with tab6:
@@ -1857,15 +1806,23 @@ if st.session_state.df_original is not None:
                 for plot in plots_by_type['outliers']:
                     st.image(plot['filepath'], caption=plot['title'])
             
-            # Sample distributions
+            # Distribution plots - Show all
             if 'distribution' in plots_by_type:
-                st.subheader("Distribution Plots (Sample)")
-                for plot in plots_by_type['distribution'][:5]:
+                st.subheader("Distribution Plots")
+                for plot in plots_by_type['distribution']:
                     st.image(plot['filepath'], caption=plot['title'])
-                
-                remaining = len(plots_by_type['distribution']) - 5
-                if remaining > 0:
-                    st.info(f"... and {remaining} more distribution plots available in output folder")
+            
+            # Categorical plots - Show all
+            if 'categorical' in plots_by_type:
+                st.subheader("Categorical Plots")
+                for plot in plots_by_type['categorical']:
+                    st.image(plot['filepath'], caption=plot['title'])
+            
+            # Pairplot
+            if 'pairplot' in plots_by_type:
+                st.subheader("Pairplot Analysis")
+                for plot in plots_by_type['pairplot']:
+                    st.image(plot['filepath'], caption=plot['title'])
     
     # Tab 7: Report
     with tab7:
