@@ -12,16 +12,28 @@ PrometheusAI Data Engine is a comprehensive data cleaning and exploratory data a
 
 ## ✨ Features
 
+### 🌟 Workflow Modes
+
+Choose your preferred interaction style:
+
+- **🤖 AI Agent**: Chat with your data in natural language and get instant insights with auto-generated visualizations
+- **⚡ Quick Wizard**: One-click automated cleaning with best practices
+- **🎯 Advanced Wizard**: Step-by-step control with column-by-column customization
+- **🔧 Manual Mode**: Full customization of every analysis step
+
 ### 🎯 Core Capabilities
 
+- **AI-Powered Chat Agent**: Ask questions in natural language and get instant insights with auto-generated visualizations
+- **Data Cleaning Wizard**: Interactive step-by-step cleaning with Quick and Advanced modes
 - **Automated Data Validation**: Instant dataset health scoring
 - **Smart Type Detection**: Intelligent inference of numeric, categorical, datetime, boolean, and text columns
-- **Missing Value Handling**: Multiple imputation strategies (mean, median, mode, forward-fill)
+- **Missing Value Handling**: Multiple imputation strategies (mean, median, mode, forward-fill) with column-by-column control
 - **Duplicate Detection**: Automatic identification and removal
 - **Outlier Management**: IQR and Z-score methods with removal/capping/flagging options
-- **Memory Optimization**: Automatic dtype downcasting to reduce memory footprint
+- **Memory Optimization**: Automatic dtype downcasting to reduce memory footprint by 30-70%
 - **Correlation Analysis**: Pearson correlation with heatmaps and insights
 - **Professional Reports**: Beautiful HTML and Markdown reports with embedded visualizations
+- **Interactive Visualizations**: Real-time charts and plots for all analysis types
 
 ### 📊 Analysis Components
 
@@ -43,15 +55,29 @@ PrometheusAI Data Engine is a comprehensive data cleaning and exploratory data a
    - **Datetime**: range, frequency inference, temporal patterns
    - **Text**: length statistics, word counts, pattern detection
 
-4. **Data Cleaning Pipeline**
-   - Standardize column names
-   - Drop constant/high-missing columns
-   - Remove duplicates
-   - Impute missing values
-   - Handle outliers (remove/cap/flag)
-   - Optimize memory usage
+4. **Data Cleaning Wizard**
+   - **Quick Mode**: One-click automated cleaning with best practices
+   - **Advanced Mode**: 8-step interactive wizard
+     - Step 1: Column name standardization
+     - Step 2: Constant column removal
+     - Step 3: High missing value column removal
+     - Step 4: Duplicate row removal
+     - Step 5: Missing value imputation (column-by-column)
+     - Step 6: Outlier handling (column-by-column)
+     - Step 7: Type conversion
+     - Step 8: Memory optimization
+   - Real-time progress tracking
+   - Preview before/after for each step
+   - Detailed statistics and visualizations
 
-5. **Visual EDA**
+5. **AI-Powered Chat Agent**
+   - Natural language queries about your data
+   - Auto-generated Python code for visualizations
+   - Interactive chat history
+   - Support for matplotlib and seaborn plots
+   - Intelligent dataframe context awareness
+
+6. **Visual EDA**
    - Distribution plots (histograms, KDE, box plots)
    - Categorical bar charts
    - Correlation heatmaps
@@ -59,11 +85,12 @@ PrometheusAI Data Engine is a comprehensive data cleaning and exploratory data a
    - Outlier visualizations
    - Pair plots
 
-6. **Downloadable Outputs**
+7. **Downloadable Outputs**
    - ✅ Cleaned CSV
    - ✅ HTML/Markdown EDA reports
    - ✅ JSON cleaning log (reproducible pipeline)
    - ✅ All visualizations (PNG)
+
 
 ---
 
@@ -95,11 +122,17 @@ streamlit run app_streamlit.py
 Then open your browser to `http://localhost:8501`
 
 **Features:**
-- Drag-and-drop CSV upload
-- Interactive tabs for each analysis step
-- Real-time visualizations
-- One-click "Full Auto Mode"
-- Download cleaned data and reports
+- **Professional Welcome Screen**: Choose from 4 workflow modes
+  - 🤖 **AI Agent**: Chat with your data using natural language
+  - ⚡ **Quick Wizard**: One-click automated cleaning
+  - 🎯 **Advanced Wizard**: Step-by-step interactive cleaning
+  - 🔧 **Manual Mode**: Full control over every parameter
+- **AI-Powered Chat**: Ask questions and get instant visualizations
+- **Interactive Wizard**: 8-step guided cleaning process with real-time previews
+- **Drag-and-drop CSV upload**
+- **Interactive tabs** for each analysis step
+- **Real-time visualizations** with matplotlib and seaborn
+- **Download cleaned data and reports**
 
 #### Option 2: FastAPI Backend (REST API)
 
@@ -144,8 +177,11 @@ report = requests.get(f'http://localhost:8000/report/{session_id}?format=html')
 
 ```
 PrometheusAI-Data-Engine/
-├── app_streamlit.py        # Streamlit UI
+├── app_streamlit.py        # Streamlit UI with AI Agent & Wizard
 ├── api_fastapi.py          # FastAPI backend
+├── agent/
+│   ├── core.py             # AI agent logic & LLM integration
+│   └── ui.py               # AI chat interface
 ├── cleaner/
 │   ├── schema_infer.py     # Type detection & inference
 │   ├── overview.py         # Dataset overview & health scoring
@@ -231,17 +267,48 @@ Reproducible pipeline configuration:
 
 ---
 
-## 🎓 Example Workflow
+## 🎓 Example Workflows
 
-### Full Auto Mode (Streamlit)
+### AI Agent Mode (Recommended for Quick Insights)
 
 1. Launch Streamlit: `streamlit run app_streamlit.py`
 2. Upload your CSV file
-3. Enable "Full Auto Mode" in sidebar
-4. Click "Run Full Pipeline"
-5. Download cleaned data and reports from the Downloads tab
+3. Navigate to the **PrometheusAI Agent** tab
+4. Configure your OpenRouter API key (or use other LLM providers)
+5. Ask questions in natural language:
+   - "Show me the distribution of the price column"
+   - "What's the correlation between age and salary?"
+   - "Create a scatter plot of x vs y"
+6. Get instant visualizations and insights
 
-### Manual Configuration (Streamlit)
+### Quick Wizard Mode (One-Click Cleaning)
+
+1. Launch Streamlit: `streamlit run app_streamlit.py`
+2. Upload your CSV file
+3. Navigate to the **Data Cleaning Wizard** tab
+4. Select **Quick Mode**
+5. Click "Run Quick Clean"
+6. Download cleaned data from the Downloads tab
+
+### Advanced Wizard Mode (Step-by-Step Control)
+
+1. Launch Streamlit: `streamlit run app_streamlit.py`
+2. Upload your CSV file
+3. Navigate to the **Data Cleaning Wizard** tab
+4. Select **Advanced Mode**
+5. Go through each step:
+   - Step 1: Standardize column names
+   - Step 2: Remove constant columns
+   - Step 3: Handle high missing columns
+   - Step 4: Remove duplicates
+   - Step 5: Impute missing values (column-by-column)
+   - Step 6: Handle outliers (column-by-column)
+   - Step 7: Convert data types
+   - Step 8: Optimize memory
+6. Review previews and statistics at each step
+7. Download cleaned data and reports
+
+### Manual Configuration (Full Control)
 
 1. Upload CSV → View preview
 2. Dataset Overview → Check health score and warnings
