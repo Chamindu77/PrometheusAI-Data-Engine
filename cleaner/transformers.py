@@ -6,7 +6,6 @@ Implements all cleaning operations with logging
 import pandas as pd
 import numpy as np
 from typing import Dict, Any, List, Tuple, Optional
-from scipy import stats
 
 
 class DataCleaner:
@@ -338,10 +337,19 @@ class DataCleaner:
             if col not in self.df.columns:
                 continue
             
-            z_scores = np.abs(stats.zscore(self.df[col].dropna()))
-            mask = pd.Series(False, index=self.df.index)
-            mask.loc[self.df[col].notna()] = z_scores > threshold
-            outlier_masks[col] = mask
+            # Manual Z-score calculation: (x - mean) / std
+            non_null = self.df[col].dropna()
+            if len(non_null) > 0:
+                mean = non_null.mean()
+                std = non_null.std()
+                if std > 0:
+                    z_scores = np.abs((non_null - mean) / std)
+                else:
+                    z_scores = pd.Series(0.0, index=non_null.index)
+                
+                mask = pd.Series(False, index=self.df.index)
+                mask.loc[non_null.index] = z_scores > threshold
+                outlier_masks[col] = mask
         
         return outlier_masks
     

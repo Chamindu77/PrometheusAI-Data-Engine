@@ -6,7 +6,6 @@ Detailed statistical analysis for each column
 import pandas as pd
 import numpy as np
 from typing import Dict, Any, List
-from scipy import stats
 
 
 def analyze_numeric_column(series: pd.Series) -> Dict[str, Any]:
@@ -56,10 +55,16 @@ def analyze_numeric_column(series: pd.Series) -> Dict[str, Any]:
     
     # Z-score outliers
     if len(non_null) > 2:
-        z_scores = np.abs(stats.zscore(non_null))
-        z_outliers = non_null[z_scores > 3]
-        analysis['outliers_zscore_count'] = len(z_outliers)
-        analysis['outliers_zscore_pct'] = (len(z_outliers) / len(non_null)) * 100
+        mean = non_null.mean()
+        std = non_null.std()
+        if std > 0:
+            z_scores = np.abs((non_null - mean) / std)
+            z_outliers = non_null[z_scores > 3]
+            analysis['outliers_zscore_count'] = len(z_outliers)
+            analysis['outliers_zscore_pct'] = (len(z_outliers) / len(non_null)) * 100
+        else:
+            analysis['outliers_zscore_count'] = 0
+            analysis['outliers_zscore_pct'] = 0.0
     
     # Distribution characteristics
     if analysis['skewness'] is not None:

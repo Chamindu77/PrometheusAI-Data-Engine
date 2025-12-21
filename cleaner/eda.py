@@ -6,14 +6,13 @@ Generates comprehensive visualizations for data analysis
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import seaborn as sns
 import os
 from typing import Dict, Any, List, Optional, Tuple
 from pathlib import Path
 
 
 # Set style
-sns.set_style("whitegrid")
+plt.style.use('ggplot') # Use ggplot as a clean substitute for seaborn styles
 plt.rcParams['figure.figsize'] = (10, 6)
 plt.rcParams['font.size'] = 10
 
@@ -152,19 +151,26 @@ class EDAVisualizer:
         
         corr_matrix = numeric_df.corr(method=method)
         
-        plt.figure(figsize=(12, 10))
-        sns.heatmap(
-            corr_matrix,
-            annot=True,
-            fmt='.2f',
-            cmap='coolwarm',
-            center=0,
-            square=True,
-            linewidths=0.5,
-            cbar_kws={"shrink": 0.8}
-        )
-        plt.title(f'Correlation Matrix ({method.capitalize()})')
-        plt.tight_layout()
+        fig, ax = plt.subplots(figsize=(12, 10))
+        im = ax.imshow(corr_matrix, cmap='coolwarm', vmin=-1, vmax=1)
+        
+        # Add colorbar
+        cbar = ax.figure.colorbar(im, ax=ax, shrink=0.8)
+        
+        # Add ticks and labels
+        ax.set_xticks(np.arange(len(corr_matrix.columns)))
+        ax.set_yticks(np.arange(len(corr_matrix.columns)))
+        ax.set_xticklabels(corr_matrix.columns, rotation=45, ha='right')
+        ax.set_yticklabels(corr_matrix.columns)
+        
+        # Add annotations
+        for i in range(len(corr_matrix.columns)):
+            for j in range(len(corr_matrix.columns)):
+                text = ax.text(j, i, f"{corr_matrix.iloc[i, j]:.2f}",
+                               ha="center", va="center", color="black" if abs(corr_matrix.iloc[i, j]) < 0.7 else "white")
+
+        ax.set_title(f'Correlation Matrix ({method.capitalize()})')
+        fig.tight_layout()
         
         filename = 'correlation_matrix.png'
         self.save_plot(filename, f'Correlation Matrix ({method})', 'correlation')
@@ -193,17 +199,20 @@ class EDAVisualizer:
         sample_size = min(100, len(self.df))
         missing_sample = missing_data[cols_with_missing].head(sample_size)
         
-        plt.figure(figsize=(12, 8))
-        sns.heatmap(
-            missing_sample.T,
-            cmap='RdYlGn_r',
-            cbar_kws={'label': 'Missing'},
-            yticklabels=True,
-            xticklabels=False
-        )
-        plt.title(f'Missing Values Pattern (First {sample_size} rows)')
-        plt.xlabel('Rows')
-        plt.ylabel('Columns')
+        fig, ax = plt.subplots(figsize=(12, 8))
+        im = ax.imshow(missing_sample.T, cmap='RdYlGn_r', aspect='auto')
+        
+        # Add colorbar
+        ax.figure.colorbar(im, ax=ax, label='Missing')
+        
+        # Add labels
+        ax.set_yticks(np.arange(len(cols_with_missing)))
+        ax.set_yticklabels(cols_with_missing)
+        ax.set_xticks([])
+        
+        ax.set_title(f'Missing Values Pattern (First {sample_size} rows)')
+        ax.set_xlabel('Rows')
+        ax.set_ylabel('Columns')
         
         filename = 'missing_values_heatmap.png'
         self.save_plot(filename, 'Missing Values Pattern', 'missing_values')
@@ -264,8 +273,26 @@ class EDAVisualizer:
         
         subset = numeric_df[top_features]
         
-        pairplot = sns.pairplot(subset, diag_kind='kde', plot_kws={'alpha': 0.6})
-        pairplot.fig.suptitle(f'Pair Plot (Top {len(top_features)} Features)', y=1.01)
+        # Simplified pairplot using matplotlib: create a scatter matrix manually
+        num_features = len(top_features)
+        fig, axes = plt.subplots(num_features, num_features, figsize=(15, 15))
+        
+        for i in range(num_features):
+            for j in range(num_features):
+                ax = axes[i, j]
+                if i == j:
+                    ax.hist(subset[top_features[i]], bins=20, alpha=0.7)
+                else:
+                    ax.scatter(subset[top_features[j]], subset[top_features[i]], alpha=0.5, s=10)
+                
+                if i == num_features - 1:
+                    ax.set_xlabel(top_features[j])
+                if j == 0:
+                    ax.set_ylabel(top_features[i])
+                
+                ax.tick_params(labelsize=8)
+
+        fig.suptitle(f'Scatter Matrix (Top {len(top_features)} Features)', y=1.01)
         
         filename = 'pairplot.png'
         filepath = os.path.join(self.output_dir, filename)
@@ -309,9 +336,17 @@ class EDAVisualizer:
                 upper = q3 + 1.5 * iqr
                 outliers = ((self.df[col] < lower) | (self.df[col] > upper)).sum()
             else:  # zscore
-                from scipy import stats
-                z_scores = np.abs(stats.zscore(self.df[col].dropna()))
-                outliers = (z_scores > 3).sum()
+                non_null = self.df[col].dropna()
+                if len(non_null) > 0:
+                    mean = non_null.mean()
+                    std = non_null.std()
+                    if std > 0:
+                        z_scores = np.abs((non_null - mean) / std)
+                        outliers = (z_scores > 3).sum()
+                    else:
+                        outliers = 0
+                else:
+                    outliers = 0
             
             if outliers > 0:
                 outlier_counts[col] = outliers
