@@ -1,6 +1,8 @@
 # 📊 PrometheusAI Data Engine
 
-**Fully Automated CSV → Cleaned Dataset → EDA Report**
+https://prometheusai-data-engine-a5o3sfxacawimgkmzp28xm.streamlit.app
+
+**Fully Automated CSV → Cleaned Dataset → EDA Report → AI-Powered Chat Agent**
 
 PrometheusAI Data Engine is a comprehensive data cleaning and exploratory data analysis automation tool. Upload any CSV file and get instant, professional-grade analysis with cleaned datasets and beautiful visualizations.
 
